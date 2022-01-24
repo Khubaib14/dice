@@ -58,6 +58,9 @@ def parse_input(string):
     """
     if string.strip() in ["1", "2", "3", "4", "5", "6"]:
         return int(string)
+    elif string.strip().lower() == "quit":
+        return "quit"
+
     else:
         print("Please enter a number from 1 to 6.")
         raise SystemExit(1)
@@ -76,19 +79,9 @@ def roll_dice(num):
 
 
 def generate_art(dice_values):
-    # Get a list of faces from the ASCII Art
-    faces = []
-    for value in dice_values:
-        faces.append(DICE_ASCII_ART[value])
+    faces = _get_dice_faces(dice_values)
 
-    # List of dice face rows
-    dice_faces_rows = []
-    for row_id in range(HEIGHT):
-        row_components = []
-        for die in faces:
-            row_components.append(die[row_id])
-        row_string = FACE_SEPARATOR.join(row_components)
-        dice_faces_rows.append(row_string)
+    dice_faces_rows = _generate_dice_faces_rows(faces)
 
     # Get header
     width = len(dice_faces_rows[0])
@@ -98,17 +91,40 @@ def generate_art(dice_values):
     return dice_faces_diagram
 
 
+def _generate_dice_faces_rows(faces):
+    # List of dice face rows
+    dice_faces_rows = []
+    for row_id in range(HEIGHT):
+        row_components = []
+        for die in faces:
+            row_components.append(die[row_id])
+        row_string = FACE_SEPARATOR.join(row_components)
+        dice_faces_rows.append(row_string)
+    return dice_faces_rows
+
+
+def _get_dice_faces(dice_values):
+    # Get a list of faces from the ASCII Art
+    faces = []
+    for value in dice_values:
+        faces.append(DICE_ASCII_ART[value])
+    return faces
+
+
 # Getting user input
+while True:
+    num_dice = input("How many dice would you like to roll? [1-6]")
 
-num_dice = input("How many dice would you like to roll? [1-6]")
+    num_dice = parse_input(num_dice)
 
-num_dice = parse_input(num_dice)
+    if isinstance(num_dice, int):
+        # Rolling the die
+        results = roll_dice(num_dice)
+        # Generating the ASCII Diagram
+        dice_face_diagram = generate_art(results)
+        # Display
+        print(f"\n{dice_face_diagram}")
 
-# Rolling the die
-results = roll_dice(num_dice)
-
-# Generating the ASCII Diagram
-dice_face_diagram = generate_art(results)
-
-# Display
-print(f"\n{dice_face_diagram}")
+    else:
+        print(num_dice)
+        break
